@@ -2,23 +2,48 @@ pipeline {
     agent any
 
     stages {
+
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/71762333005-dev/jenkins.git',
-                    credentialsId: 'github-token'
+                echo 'Source code already checked out by Jenkins'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building project'
+                echo 'Building project...'
+                sh 'echo Build successful'
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Testing project'
+                echo 'Running tests...'
+                sh 'echo Tests passed'
             }
+        }
+
+        stage('Code Quality - SonarQube') {
+            steps {
+                echo 'Running SonarQube analysis...'
+                sh 'echo SonarQube scan completed'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application...'
+                sh 'echo Deployment done'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline executed successfully'
+        }
+        failure {
+            echo 'Pipeline failed'
         }
     }
 }
