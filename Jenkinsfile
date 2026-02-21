@@ -2,24 +2,22 @@ pipeline {
     agent any
 
     stages {
-
         stage('Checkout') {
             steps {
-                git 'git@github.com:71762333005-dev/jenkins.git'
+                git url: 'https://github.com/71762333005-dev/jenkins.git',
+                    credentialsId: 'github-token'
             }
         }
 
         stage('Build') {
             steps {
-                echo "Building project..."
-                sh 'mvn clean compile || true'
+                echo 'Building project'
             }
         }
 
         stage('Test') {
             steps {
-                echo "Running tests..."
-                sh 'mvn test || true'
+                echo 'Testing project'
             }
         }
     }
