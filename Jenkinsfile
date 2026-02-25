@@ -1,54 +1,47 @@
 pipeline {
     agent any
 
+    tools {
+        sonarQubeScanner 'sonar-scanner'
+    }
+
     stages {
 
         stage('Checkout') {
             steps {
-                echo 'Source code already checked out by Jenkins'
+                echo 'Source code already checked out'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building project...'
                 sh 'echo Build successful'
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Running tests...'
                 sh 'echo Tests passed'
             }
         }
 
-       stage('Code Quality - SonarQube') {
-    steps {
-        echo 'Running SonarQube analysis...'
-        withSonarQubeEnv('My Sonar Server') {
-            script {
-                def scannerHome = tool 'SonarScanner'
-                sh "${scannerHome}/bin/sonar-scanner"
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('My Sonar Server') {
+                    sh '''
+                    sonar-scanner \
+                    -Dsonar.projectKey=jenkins-project \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=http://localhost:9000
+                    '''
+                }
             }
         }
-    }
-}
 
         stage('Deploy') {
             steps {
-                echo 'Deploying application...'
                 sh 'echo Deployment done'
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline executed successfully'
-        }
-        failure {
-            echo 'Pipeline failed'
         }
     }
 }
