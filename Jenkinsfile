@@ -23,14 +23,17 @@ pipeline {
             }
         }
 
-        stage('Code Quality - SonarQube') {
-            steps {
-                echo 'Running SonarQube analysis...'
-                withSonarQubeEnv('My Sonar Server') {
-                    sh 'sonar-scanner'
-                }
+       stage('Code Quality - SonarQube') {
+    steps {
+        echo 'Running SonarQube analysis...'
+        withSonarQubeEnv('My Sonar Server') {
+            script {
+                def scannerHome = tool 'SonarScanner'
+                sh "${scannerHome}/bin/sonar-scanner"
             }
         }
+    }
+}
 
         stage('Deploy') {
             steps {
