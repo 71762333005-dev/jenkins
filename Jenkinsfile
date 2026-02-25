@@ -1,15 +1,11 @@
 pipeline {
     agent any
 
-    tools {
-        sonarQubeScanner 'sonar-scanner'
-    }
-
     stages {
 
         stage('Checkout') {
             steps {
-                echo 'Source code already checked out'
+                echo 'Source code checked out'
             }
         }
 
@@ -29,7 +25,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('My Sonar Server') {
                     sh '''
-                    sonar-scanner \
+                    /var/lib/jenkins/tools/hudson.plugins.sonar.SonarRunnerInstallation/sonar-scanner/bin/sonar-scanner \
                     -Dsonar.projectKey=jenkins-project \
                     -Dsonar.sources=. \
                     -Dsonar.host.url=http://localhost:9000
