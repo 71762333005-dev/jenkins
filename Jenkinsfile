@@ -20,17 +20,16 @@ pipeline {
                 sh 'echo Tests passed'
             }
         }
-
-   stage('SonarQube Analysis') {
+stage('SonarQube Analysis') {
     steps {
-        script {
-            def scannerHome = tool 'SonarScanner'
-            withSonarQubeEnv('My Sonar Server') {
-                sh """
-                    ${scannerHome}/bin/sonar-scanner \
-                    -Dsonar.projectKey=jenkins-project \
-                    -Dsonar.sources=.
-                """
+        withSonarQubeEnv('My Sonar Server') {
+            withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                sh '''
+                /var/snap/jenkins/4998/tools/hudson.plugins.sonar.SonarRunnerInstallation/SonarScanner/bin/sonar-scanner \
+                -Dsonar.projectKey=jenkins-project \
+                -Dsonar.sources=. \
+                -Dsonar.login=$SONAR_TOKEN
+                '''
             }
         }
     }
