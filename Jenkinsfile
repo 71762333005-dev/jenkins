@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        sonarRunner 'SonarScanner'
-    }
-
     stages {
 
         stage('Checkout') {
@@ -27,14 +23,17 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('My Sonar Server') {
-                    sh '''
-                        sonar-scanner \
-                        -Dsonar.projectKey=jenkins-project \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=$SONAR_HOST_URL \
-                        -Dsonar.login=$SONAR_AUTH_TOKEN
-                    '''
+                script {
+                    def scannerHome = tool 'SonarScanner'
+                    withSonarQubeEnv('My Sonar Server') {
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=jenkins-project \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=$SONAR_HOST_URL \
+                            -Dsonar.login=$SONAR_AUTH_TOKEN
+                        """
+                    }
                 }
             }
         }
