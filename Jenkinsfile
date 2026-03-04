@@ -22,13 +22,13 @@ pipeline {
         }
 stage('SonarQube Analysis') {
     steps {
-        withSonarQubeEnv('My Sonar Server') {
-            sh '''
-            /var/snap/jenkins/4998/tools/hudson.plugins.sonar.SonarRunnerInstallation/SonarScanner/bin/sonar-scanner \
-            -Dsonar.projectKey=jenkins-project \
-            -Dsonar.sources=.
-            '''
-        }
+        sh '''
+        /var/snap/jenkins/4998/tools/hudson.plugins.sonar.SonarRunnerInstallation/SonarScanner/bin/sonar-scanner \
+        -Dsonar.projectKey=jenkins-project \
+        -Dsonar.sources=. \
+        -Dsonar.host.url=http://localhost:9000 \
+        -Dsonar.login=squ_883e63a675a6e8df175015182eda8a7bc454c644
+        '''
     }
 }
 
