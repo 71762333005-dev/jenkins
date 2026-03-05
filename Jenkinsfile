@@ -21,14 +21,17 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('My Sonar Server') {
-                    sh 'sonar-scanner -Dsonar.projectKey=jenkins-project -Dsonar.sources=.'
-                }
-            }
+   stage('SonarQube Analysis') {
+    steps {
+        withSonarQubeEnv('My Sonar Server') {
+            sh """
+            ${tool 'SonarScanner'}/bin/sonar-scanner \
+            -Dsonar.projectKey=jenkins-project \
+            -Dsonar.sources=.
+            """
         }
-
+    }
+}
         stage("Quality Gate") {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
