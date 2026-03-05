@@ -2,12 +2,11 @@ pipeline {
     agent any
 
     tools {
-        // Correct tool type for SonarScanner
-        sonarRunner 'SonarScanner' 
+        sonarRunner 'SonarScanner' // matches your Jenkins Sonar installation
     }
 
     stages {
-        stage('Checkout SCM') {
+        stage('Checkout') {
             steps {
                 checkout scm
             }
@@ -35,7 +34,7 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                // Increase timeout to avoid aborted pipeline
+                // Increase timeout to 5 minutes to avoid aborted pipeline
                 timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
