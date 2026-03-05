@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        // Correct tool type
-        sonar 'SonarScanner'
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -27,8 +22,8 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('My Sonar Server') {
-                    sh 'sonar-scanner -Dsonar.projectKey=jenkins-project -Dsonar.sources=.'
+                withSonarQubeEnv('My Sonar Server') { // Jenkins Sonar name
+                    sh '/var/snap/jenkins/5001/tools/hudson.plugins.sonar.SonarRunnerInstallation/SonarScanner/bin/sonar-scanner -Dsonar.projectKey=jenkins-project -Dsonar.sources=.'
                 }
             }
         }
