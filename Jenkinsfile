@@ -1,15 +1,10 @@
 pipeline {
     agent any
 
-    environment {
-        // This must match the SonarQube installation name in Jenkins
-        SONARQUBE_ENV = 'My Sonar Server'
-    }
-
     stages {
-        stage('Checkout SCM') {
+        stage('Checkout') {
             steps {
-                checkout scm
+                git url: 'https://github.com/71762333005-dev/jenkins.git', branch: 'main', credentialsId: 'github-token'
             }
         }
 
@@ -26,33 +21,35 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
+            environment {
+                SONAR_HOST_URL = 'http://127.0.0.1:9000'
+                SONAR_SCANNER_HOME = '/var/snap/jenkins/5001/tools/hudson.plugins.sonar.SonarRunnerInstallation/SonarScanner'
+            }
             steps {
-                // Inject SonarQube environment
-                withSonarQubeEnv("${SONARQUBE_ENV}") {
-                    sh """
-                    /var/snap/jenkins/5001/tools/hudson.plugins.sonar.SonarRunnerInstallation/SonarScanner/bin/sonar-scanner \
-                    -Dsonar.projectKey=jenkins-project \
-                    -Dsonar.sources=.
-                    """
+                withSonarQubeEnv('My Sonar Server') {
+                    sh "${SONAR_SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=jenkins-project -Dsonar.sources=."
                 }
             }
         }
-stage('Quality Gate') {
-    steps {
-        timeout(time: 5, unit: 'MINUTES') {
-            script {
-                def qg = waitForQualityGate()
-                if (qg.status != 'OK') {
-                    error "Pipeline aborted due to failed Quality Gate: ${qg.status}"
+
+        stage('Quality Gate') {
+            steps {
+                script {
+                    timeout(time: 10, unit: 'MINUTES') {
+                        // Wait for SonarQube result and fail build if gate is not passed
+                        def qg = waitForQualityGate(abortPipeline: true)
+                        echo "Quality Gate status: ${qg.status}"
+                    }
                 }
             }
         }
-    }
-}
 
         stage('Deploy') {
+            when {
+                expression { return currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+            }
             steps {
-                sh 'echo Deploying to production...'
+                sh 'echo Deploying to AWS/Nexus'
             }
         }
     }
