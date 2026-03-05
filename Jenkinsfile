@@ -1,11 +1,16 @@
 pipeline {
     agent any
 
+    tools {
+        // Make sure you have configured SonarScanner in Jenkins
+        sonarScanner 'SonarScanner'
+    }
+
     stages {
 
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/71762333005-dev/jenkins.git', branch: 'main'
+                git url: 'https://github.com/71762333005-dev/jenkins.git', branch: 'main', credentialsId: 'github-token'
             }
         }
 
@@ -25,7 +30,7 @@ pipeline {
             steps {
                 script {
                     def scannerHome = tool 'SonarScanner'
-                    withSonarQubeEnv('My Sonar Server') {
+                    withSonarQubeEnv('My Sonar Server') {  // Server name in Jenkins
                         sh """
                         ${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=jenkins-project \
@@ -37,12 +42,12 @@ pipeline {
         }
 
         stage('Quality Gate') {
-          steps {
-               timeout(time: 5, unit: 'MINUTES') { // increased from 2 to 5
-                 waitForQualityGate abortPipeline: true
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {  // Increased timeout to 5 mins
+                    waitForQualityGate abortPipeline: true
+                }
+            }
         }
-    }
-}
 
         stage('Deploy') {
             steps {
