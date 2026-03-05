@@ -37,20 +37,18 @@ pipeline {
                 }
             }
         }
-
-        stage('Quality Gate') {
-            steps {
-                // Wait for SonarQube Quality Gate result
-                timeout(time: 5, unit: 'MINUTES') {
-                    script {
-                        def qg = waitForQualityGate()
-                        if (qg.status != 'OK') {
-                            error "Pipeline aborted due to failed Quality Gate: ${qg.status}"
-                        }
-                    }
+stage('Quality Gate') {
+    steps {
+        timeout(time: 5, unit: 'MINUTES') {
+            script {
+                def qg = waitForQualityGate()
+                if (qg.status != 'OK') {
+                    error "Pipeline aborted due to failed Quality Gate: ${qg.status}"
                 }
             }
         }
+    }
+}
 
         stage('Deploy') {
             steps {
