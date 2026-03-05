@@ -1,11 +1,15 @@
 pipeline {
     agent any
 
-    stages {
+    tools {
+        // Correct tool type for SonarScanner
+        sonarRunner 'SonarScanner' 
+    }
 
-        stage('Checkout') {
+    stages {
+        stage('Checkout SCM') {
             steps {
-                git url: 'https://github.com/71762333005-dev/jenkins.git', branch: 'main', credentialsId: 'github-token'
+                checkout scm
             }
         }
 
@@ -23,26 +27,22 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                script {
-                    // 'SonarScanner' is the name configured under Jenkins → Manage Jenkins → Global Tool Configuration
-                    def scannerHome = tool 'SonarScanner'
-                    withSonarQubeEnv('My Sonar Server') {
-                        sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=jenkins-project \
-                        -Dsonar.sources=.
-                        """
-                    }
+                withSonarQubeEnv('My Sonar Server') {
+                    sh 'sonar-scanner -Dsonar.projectKey=jenkins-project -Dsonar.sources=.'
                 }
             }
         }
-stage('Quality Gate') {
-    steps {
-        timeout(time: 5, unit: 'MINUTES') {
-            waitForQualityGate abortPipeline: true
+
+        stage('Quality Gate') {
+            steps {
+                // Increase timeout to avoid aborted pipeline
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
         }
-    }
-}      stage('Deploy') {
+
+        stage('Deploy') {
             steps {
                 sh 'echo Deploying application'
             }
