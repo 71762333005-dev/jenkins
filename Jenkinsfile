@@ -1,10 +1,19 @@
 pipeline {
     agent any
 
+    environment {
+        // SonarQube server name configured in Jenkins
+        SONARQUBE_SERVER = 'My Sonar Server'
+        // Path to SonarScanner installation
+        SONAR_SCANNER_HOME = '/var/snap/jenkins/5001/tools/hudson.plugins.sonar.SonarRunnerInstallation/SonarScanner'
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/71762333005-dev/jenkins.git', branch: 'main', credentialsId: 'github-token'
+                git url: 'https://github.com/71762333005-dev/jenkins.git',
+                    branch: 'main',
+                    credentialsId: 'github-token'
             }
         }
 
@@ -21,13 +30,15 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            environment {
-                SONAR_HOST_URL = 'http://127.0.0.1:9000'
-                SONAR_SCANNER_HOME = '/var/snap/jenkins/5001/tools/hudson.plugins.sonar.SonarRunnerInstallation/SonarScanner'
-            }
             steps {
-                withSonarQubeEnv('My Sonar Server') {
-                    sh "${SONAR_SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=jenkins-project -Dsonar.sources=."
+                // This runs the SonarScanner
+                withSonarQubeEnv(SONARQUBE_SERVER) {
+                    sh """
+                        ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                        -Dsonar.projectKey=jenkins-project \
+                        -Dsonar.sources=src/main/java \
+                        -Dsonar.java.binaries=target/classes
+                    """
                 }
             }
         }
@@ -35,8 +46,8 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 script {
+                    // Wait for SonarQube Quality Gate result
                     timeout(time: 10, unit: 'MINUTES') {
-                        // Wait for SonarQube result and fail build if gate is not passed
                         def qg = waitForQualityGate(abortPipeline: true)
                         echo "Quality Gate status: ${qg.status}"
                     }
@@ -46,11 +57,20 @@ pipeline {
 
         stage('Deploy') {
             when {
-                expression { return currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
             steps {
-                sh 'echo Deploying to AWS/Nexus'
+                sh 'echo Deploying to AWS/Nexus...'
             }
+        }
+    }
+
+    post {
+        failure {
+            echo 'Build failed due to Quality Gate violation! Deployment skipped.'
+        }
+        success {
+            echo 'Build passed all stages. Deployment executed successfully.'
         }
     }
 }
