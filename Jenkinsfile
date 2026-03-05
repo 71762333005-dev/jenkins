@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        // Make sure you have configured SonarScanner in Jenkins
-        sonarScanner 'SonarScanner'
-    }
-
     stages {
 
         stage('Checkout') {
@@ -29,8 +24,9 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
+                    // 'SonarScanner' is the name configured under Jenkins → Manage Jenkins → Global Tool Configuration
                     def scannerHome = tool 'SonarScanner'
-                    withSonarQubeEnv('My Sonar Server') {  // Server name in Jenkins
+                    withSonarQubeEnv('My Sonar Server') {
                         sh """
                         ${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=jenkins-project \
@@ -43,7 +39,7 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                timeout(time: 5, unit: 'MINUTES') {  // Increased timeout to 5 mins
+                timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
