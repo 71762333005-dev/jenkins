@@ -1,8 +1,13 @@
 pipeline {
     agent any
 
+    environment {
+        // This must match the SonarQube installation name in Jenkins
+        SONARQUBE_ENV = 'My Sonar Server'
+    }
+
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
                 checkout scm
             }
@@ -22,26 +27,34 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('My Sonar Server') { // Jenkins Sonar name
-                    sh '/var/snap/jenkins/5001/tools/hudson.plugins.sonar.SonarRunnerInstallation/SonarScanner/bin/sonar-scanner -Dsonar.projectKey=jenkins-project -Dsonar.sources=.'
+                // Inject SonarQube environment
+                withSonarQubeEnv("${SONARQUBE_ENV}") {
+                    sh """
+                    /var/snap/jenkins/5001/tools/hudson.plugins.sonar.SonarRunnerInstallation/SonarScanner/bin/sonar-scanner \
+                    -Dsonar.projectKey=jenkins-project \
+                    -Dsonar.sources=.
+                    """
                 }
             }
         }
 
- stage('Quality Gate') {
-    steps {
-        timeout(time: 10, unit: 'MINUTES') {
-            script {
-                def qg = waitForQualityGate()
-                echo "Quality Gate status: ${qg.status}"
+        stage('Quality Gate') {
+            steps {
+                // Wait for SonarQube Quality Gate result
+                timeout(time: 5, unit: 'MINUTES') {
+                    script {
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted due to failed Quality Gate: ${qg.status}"
+                        }
+                    }
+                }
             }
         }
-    }
-}
 
         stage('Deploy') {
             steps {
-                sh 'echo Deploying application'
+                sh 'echo Deploying to production...'
             }
         }
     }
