@@ -38,12 +38,11 @@ pipeline {
         }
 stage('Quality Gate') {
     steps {
-        timeout(time: 2, unit: 'MINUTES') {
+        timeout(time: 5, unit: 'MINUTES') {
             waitForQualityGate abortPipeline: true
         }
     }
-}
-        stage('Deploy') {
+}      stage('Deploy') {
             steps {
                 sh 'echo Deploying application'
             }
