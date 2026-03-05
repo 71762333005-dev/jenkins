@@ -21,13 +21,14 @@ pipeline {
             }
         }
 
-   stage('SonarQube Analysis') {
+stage('SonarQube Analysis') {
     steps {
         withSonarQubeEnv('My Sonar Server') {
             sh """
             ${tool 'SonarScanner'}/bin/sonar-scanner \
             -Dsonar.projectKey=jenkins-project \
-            -Dsonar.sources=.
+            -Dsonar.sources=. \
+            -Dsonar.login=squ_95e5afc880d3dc9261ff6e34c3b22919bd5a9181
             """
         }
     }
