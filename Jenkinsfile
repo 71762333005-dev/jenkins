@@ -7,11 +7,11 @@ pipeline {
 
     stages {
 
-         stage('Checkout') {
-               steps {
-                  git branch: 'main', url: 'https://github.com/71762333005-dev/jenkins.git'
-    }
-}
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/71762333005-dev/jenkins.git'
+            }
+        }
 
         stage('Build') {
             steps {
@@ -25,7 +25,8 @@ pipeline {
                     sh '''
                     $SCANNER_HOME/bin/sonar-scanner \
                     -Dsonar.projectKey=demo-project \
-                    -Dsonar.sources=. \
+                    -Dsonar.sources=src \
+                    -Dsonar.java.binaries=target \
                     -Dsonar.host.url=http://localhost:9000 \
                     -Dsonar.login=squ_14a06b4827a7cceb07815c7f2cf84ac5109e4e51
                     '''
