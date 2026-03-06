@@ -8,10 +8,11 @@ pipeline {
     stages {
 
         stage('Checkout') {
-            steps {
-                git 'https://github.com/your-repo/project.git'
-            }
-        }
+                steps {
+                   git url: 'https://github.com/71762333005-dev/jenkins.git',
+                      credentialsId: 'github-token'
+     }
+  }
 
         stage('Build') {
             steps {
