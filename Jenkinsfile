@@ -1,75 +1,51 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'OpenJDK 17' // Make sure you have a JDK configured in Jenkins
-    }
-
     environment {
-        SONAR_HOST_URL = 'http://127.0.0.1:9000'
-        SONAR_SCANNER_HOME = '/var/snap/jenkins/5001/tools/hudson.plugins.sonar.SonarRunnerInstallation/SonarScanner'
+        SCANNER_HOME = tool 'sonar-scanner'
     }
 
     stages {
+
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/71762333005-dev/jenkins.git', branch: 'main', credentialsId: 'github-token'
+                git 'https://github.com/your-repo/project.git'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Compiling Java code...'
-                sh 'mkdir -p target/classes'        // create output folder
-                sh 'javac -d target/classes src/main/java/*.java'  // compile all Java files
-            }
-        }
-
-        stage('Test') {
-            steps {
-                echo 'Skipping tests for now...'
+                sh 'mvn clean package'
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('My Sonar Server') {
-                    sh """
-                        ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-                        -Dsonar.projectKey=jenkins-project \
-                        -Dsonar.sources=src/main/java \
-                        -Dsonar.java.binaries=target/classes
-                    """
+                withSonarQubeEnv('SonarQube-Server') {
+                    sh '''
+                    $SCANNER_HOME/bin/sonar-scanner \
+                    -Dsonar.projectKey=demo-project \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=http://localhost:9000 \
+                    -Dsonar.login=squ_7e4a984ee5161b3289315079ca9438823667b005
+                    '''
                 }
             }
         }
 
-        stage('Quality Gate') {
+        stage("Quality Gate") {
             steps {
-                script {
-                    // Wait up to 10 minutes for SonarQube analysis to finish
-                    timeout(time: 10, unit: 'MINUTES') {
-                        def qg = waitForQualityGate(abortPipeline: true)
-                        echo "Quality Gate status: ${qg.status}"
-                        // abortPipeline: true ensures Jenkins fails the build automatically
-                    }
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
 
-        stage('Deploy') {
-            when {
-                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
-            }
+        stage('Upload to Nexus') {
             steps {
-                echo 'Deploying to AWS/Nexus...'
+                echo "Deploying artifact..."
             }
         }
-    }
 
-    post {
-        failure {
-            echo 'Build failed due to Quality Gate violation! Deployment skipped.'
-        }
     }
 }
