@@ -5,19 +5,19 @@ public class App {
         // Load API key securely instead of hardcoding
         String apiKey = System.getenv("API_KEY");
 
-        if (apiKey == null) {
+        if (apiKey == null || apiKey.isEmpty()) {
             System.out.println("API key not found.");
         } else {
             System.out.println("API key loaded securely.");
         }
 
         try {
-            int x = 10 / 2; // Fixed division
+            int x = 10 / 2; 
             System.out.println("Result: " + x);
         } catch (Exception e) {
             System.out.println("Error occurred: " + e.getMessage());
         }
 
-        System.out.println("Hello World");
+        System.out.println("Application executed successfully.");
     }
 }
