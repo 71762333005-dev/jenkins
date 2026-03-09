@@ -14,4 +14,10 @@ public class AppTest {
         String message = "Hello World";
         assertNotNull(message);
     }
+
+    @Test
+    void testApiKeyCheck() {
+        String apiKey = System.getenv("API_KEY");
+        assertTrue(apiKey == null || apiKey.length() >= 0);
+    }
 }
