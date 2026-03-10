@@ -1,23 +1,23 @@
+package com.example;
+
+import java.util.logging.Logger;
+
 public class CodeSmellTest {
+
+    private static final Logger logger = Logger.getLogger(CodeSmellTest.class.getName());
 
     public static void main(String[] args) {
 
-        try {
-            int denominator = 2; // ensure it is not zero
+        int denominator = 2;
 
-            if (denominator != 0) {
-                int result = 10 / denominator;
-                System.out.println("Result: " + result);
-            } else {
-                System.out.println("Denominator cannot be zero.");
-            }
-
-        } catch (Exception e) {
-            System.out.println("Error occurred: " + e.getMessage());
+        if (denominator == 0) {
+            logger.warning("Denominator cannot be zero");
+        } else {
+            int result = 10 / denominator;
+            logger.info("Result: " + result);
         }
 
-        // Fix hardcoded API key
         String apiKey = System.getenv("API_KEY");
-        System.out.println("API Key: " + apiKey);
+        logger.info("API Key loaded: " + apiKey);
     }
 }
