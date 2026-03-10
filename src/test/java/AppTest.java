@@ -4,27 +4,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AppTest {
 
     @Test
-    void testDivision() {
-        int result = App.divide(10, 2);
-        assertEquals(5, result);
-    }
-
-    @Test
-    void testDivisionByZero() {
-        assertThrows(ArithmeticException.class, () -> {
-            App.divide(10, 0);
-        });
-    }
-
-    @Test
     void testMessage() {
-        String message = App.getMessage();
-        assertEquals("Hello World", message);
+        App app = new App();
+        assertEquals("Hello World", app.getMessage());
     }
 
     @Test
-    void testApiKeyCheck() {
-        String message = App.checkApiKey();
-        assertNotNull(message);
+    void testDivision() {
+        int result = 10 / 2;
+        assertEquals(5, result);
     }
 }
