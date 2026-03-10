@@ -5,19 +5,26 @@ public class AppTest {
 
     @Test
     void testDivision() {
-        int result = 10 / 2;
+        int result = App.divide(10, 2);
         assertEquals(5, result);
     }
 
     @Test
+    void testDivisionByZero() {
+        assertThrows(ArithmeticException.class, () -> {
+            App.divide(10, 0);
+        });
+    }
+
+    @Test
     void testMessage() {
-        String message = "Hello World";
-        assertNotNull(message);
+        String message = App.getMessage();
+        assertEquals("Hello World", message);
     }
 
     @Test
     void testApiKeyCheck() {
-        String apiKey = System.getenv("API_KEY");
-        assertTrue(apiKey == null || apiKey.length() >= 0);
+        String message = App.checkApiKey();
+        assertNotNull(message);
     }
 }
