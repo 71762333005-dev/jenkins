@@ -1,18 +1,25 @@
 public class App {
 
-    public static void main(String[] args) {
-
-        // Load API key securely instead of hardcoding
+    public static String checkApiKey() {
         String apiKey = System.getenv("API_KEY");
 
         if (apiKey == null || apiKey.isEmpty()) {
-            System.out.println("API key not found.");
+            return "API key not found.";
         } else {
-            System.out.println("API key loaded securely.");
+            return "API key loaded securely.";
         }
+    }
+
+    public static int divide(int a, int b) {
+        return a / b;
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println(checkApiKey());
 
         try {
-            int x = 10 / 2; 
+            int x = divide(10, 2);
             System.out.println("Result: " + x);
         } catch (Exception e) {
             System.out.println("Error occurred: " + e.getMessage());
