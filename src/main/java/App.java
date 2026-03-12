@@ -1,23 +1,31 @@
+package com.demo.project;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class App {
+
+    private static final Logger logger =
+            Logger.getLogger(App.class.getName());
 
     public static void main(String[] args) {
 
-        // Fix 1: Read API key from environment variable
+        // Read API key from environment variable
         String apiKey = System.getenv("API_KEY");
 
         try {
-            int x = 10 / 2; // Fix 2: avoid division by zero
-            System.out.println("Result: " + x);
+            int x = 10 / 2; // safe division
+            logger.info("Result: " + x);
 
         } catch (Exception e) {
-            // Fix 3: handle exception properly
-            System.out.println("Error occurred: " + e.getMessage());
+            // Proper logging instead of System.out
+            logger.log(Level.SEVERE, "Error occurred", e);
         }
 
-        System.out.println("Hello World");
+        logger.info("Hello World");
     }
 
-    // Method added so test case works
+    // Method used by test case
     public String getMessage() {
         return "Hello World";
     }
