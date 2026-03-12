@@ -1,23 +1,29 @@
-package com.example;
+public class App {
 
-import java.util.logging.Logger;
-
-public class CodeSmellTest {
-
-    private static final Logger logger = Logger.getLogger(CodeSmellTest.class.getName());
+    public static int divide(int a, int b) {
+        if (b == 0) {
+            throw new IllegalArgumentException("Denominator cannot be zero");
+        }
+        return a / b;
+    }
 
     public static void main(String[] args) {
 
         int denominator = 2;
 
-        if (denominator == 0) {
-            logger.warning("Denominator cannot be zero");
-        } else {
-            int result = 10 / denominator;
-            logger.info("Result: " + result);
+        try {
+            int result = divide(10, denominator);
+            System.out.println("Result: " + result);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
 
         String apiKey = System.getenv("API_KEY");
-        logger.info("API Key loaded: " + apiKey);
+
+        if (apiKey != null && !apiKey.isEmpty()) {
+            System.out.println("API Key loaded");
+        } else {
+            System.out.println("API Key missing");
+        }
     }
 }
